@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import data from "../data.json";
+import skaters_stats from "../skaters_stats.json";
 import "./App.css";
 
 const allFields = [
@@ -25,15 +25,50 @@ const allFields = [
   { key: "shotsPerGame", label: "Shots/Game" },
 ];
 
+const defaultFields = [
+  "skaterFullName",
+  "teamAbbrevs",
+  "gamesPlayed",
+  "points",
+  "goals",
+  "assists",
+];
+
+type Player = {
+  playerId: number;
+  skaterFullName: string;
+  teamAbbrevs: string;
+  gamesPlayed: number;
+  points: number;
+  goals: number;
+  assists: number;
+  plusMinus: number;
+  ppGoals: number;
+  shGoals: number;
+  shots: number;
+  shootingPct: number;
+  timeOnIcePerGame: string;
+  evGoals: number;
+  evPoints: number;
+  gameWinningGoals: number;
+  otGoals: number;
+  penaltyMinutes: number;
+  pointsPerGame: number;
+  goalsPerGame: number;
+  shotsPerGame: number;
+};
+
 function App() {
-  const [players, setPlayers] = useState(data.data);
+  const [players, setPlayers] = useState<Player[]>(skaters_stats.data);
   const [searchTerm, setSearchTerm] = useState("");
-  const [visibleFields, setVisibleFields] = useState(allFields.map(field => field.key));
+  const [visibleFields, setVisibleFields] = useState(defaultFields);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const rowsPerPage = 50;
 
   useEffect(() => {
     setPlayers(
-      data.data.filter((player) =>
+      skaters_stats.data.filter((player: Player) =>
         player.skaterFullName.toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
@@ -46,6 +81,15 @@ function App() {
         : [...prevFields, fieldKey]
     );
   };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  const paginatedPlayers = players.slice(
+    currentPage * rowsPerPage,
+    (currentPage + 1) * rowsPerPage
+  );
 
   return (
     <main>
@@ -87,15 +131,35 @@ function App() {
           </tr>
         </thead>
         <tbody>
-          {players.map((player) => (
+          {paginatedPlayers.map((player) => (
             <tr key={player.playerId}>
               {allFields.map(field => (
-                visibleFields.includes(field.key) && <td key={field.key}>{player[field.key]}</td>
+                visibleFields.includes(field.key) && (
+                  <td key={field.key}>
+                    {typeof player[field.key as keyof Player] === "number"
+                      ? (player[field.key as keyof Player] as number).toFixed(2)
+                      : player[field.key as keyof Player]}
+                  </td>
+                )
               ))}
             </tr>
           ))}
         </tbody>
       </table>
+      <div className="pagination">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 0}
+        >
+          Previous
+        </button>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={(currentPage + 1) * rowsPerPage >= players.length}
+        >
+          Next
+        </button>
+      </div>
     </main>
   );
 }

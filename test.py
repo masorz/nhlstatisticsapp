@@ -239,5 +239,8 @@ skaters_stats_mock = {
 }
 
 season_id = "20242025"
-updated_skaters_stats = update_skaters_stats(skaters_stats_mock, season_id)
+updated_skaters_stats = update_skaters_stats(skaters_stats, season_id)
 print(json.dumps(updated_skaters_stats, indent=4))
+
+with open("skaters_stats.json", "w") as outfile:
+    json.dump(updated_skaters_stats, outfile, indent=4)
