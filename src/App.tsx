@@ -91,9 +91,11 @@ function App() {
     (currentPage + 1) * rowsPerPage
   );
 
-  return (
+  return (    
     <main>
-      <h1>NHL Player Statistics</h1>
+      <h1 className="text-3xl font-bold underline">
+        NHL Player Statistics
+      </h1>
       <input
         type="text"
         placeholder="Search by player name"
