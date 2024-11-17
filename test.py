@@ -33,7 +33,7 @@ def calculate_last_5_games_stats(last_5_games):
     )
 
     shots_per_game_last_5 = (
-        shots_last_5 / len(last_5_games) if len(last_5_games) > 0 else 0
+        round(shots_last_5 / len(last_5_games), 2) if len(last_5_games) > 0 else 0
     )
 
     return {
@@ -50,8 +50,12 @@ def calculate_scoring_probabilites(game_log, total_games, score_threshold):
     """Calculates the probability of scoring points or goals."""
     games_with_points = sum(1 for game in game_log if game["points"] >= score_threshold)
     games_with_goals = sum(1 for game in game_log if game["goals"] >= score_threshold)
-    prob_points = games_with_points / total_games if total_games > 0 else 0
-    prob_goals = games_with_goals / total_games if total_games > 0 else 0
+    prob_points = (
+        round((games_with_points / total_games) * 100, 2) if total_games > 0 else 0
+    )
+    prob_goals = (
+        round((games_with_goals / total_games) * 100, 2) if total_games > 0 else 0
+    )
 
     return {
         "prob_points": prob_points,
@@ -109,27 +113,29 @@ def calculate_new_statistics(player, season_id):
     last_5_probabilities = calculate_last_5_probabilities(last_5_games)
 
     # Calculate shots per game
-    shots_per_game = player["shots"] / total_games if total_games > 0 else 0
+    shots_per_game = round(player["shots"] / total_games, 2) if total_games > 0 else 0
 
     # Convert timeOnIcePerGame from seconds to minutes and seconds
-    toi_per_game = player["timeOnIcePerGame"]
+    toi_per_game = round(player["timeOnIcePerGame"], 2)
     player["timeOnIcePerGame"] = convert_toi_to_str(player["timeOnIcePerGame"])
 
     # calculate goals per game
-    goals_per_game = player["goals"] / total_games if total_games > 0 else 0
+    goals_per_game = round(player["goals"] / total_games, 2) if total_games > 0 else 0
 
     # Calculate target points
-    target_points = player["pointsPerGame"] * scheduled_games_count
-    target_goals = goals_per_game * scheduled_games_count
+    target_points = round(player["pointsPerGame"] * scheduled_games_count, 2)
+    target_goals = round(goals_per_game * scheduled_games_count, 2)
 
     return {
-        "TimeOnIcePerGameSec": toi_per_game,
+        "pointsPerGame": round(player["pointsPerGame"], 2),
+        "shootingPct": round(player["shootingPct"] * 100, 2),
+        "timeOnIcePerGameSec": toi_per_game,
         "goalsPerGame": goals_per_game,
         "shotsPerGame": shots_per_game,
         "pointProbability": probabilities["prob_point"],
         "goalProbability": probabilities["prob_goal"],
-        "2pointProbability": probabilities["prob_2point"],
-        "2goalProbability": probabilities["prob_2goal"],
+        "twoPointProbability": probabilities["prob_2point"],
+        "twoGoalProbability": probabilities["prob_2goal"],
         "targetPoints": target_points,
         "targetGoals": target_goals,
         "pointsLast5": last_5_stats["points_last_5"],
@@ -141,8 +147,8 @@ def calculate_new_statistics(player, season_id):
         "TOIperGameLast5": convert_toi_to_str(last_5_stats["toi_per_game_last_5"]),
         "pointProbabilityLast5": last_5_probabilities["prob_point_last_5"],
         "goalProbabilityLast5": last_5_probabilities["prob_goal_last_5"],
-        "2pointProbabilityLast5": last_5_probabilities["prob_2point_last_5"],
-        "2goalProbabilityLast5": last_5_probabilities["prob_2goal_last_5"],
+        "twoPointProbabilityLast5": last_5_probabilities["prob_2point_last_5"],
+        "twoGoalProbabilityLast5": last_5_probabilities["prob_2goal_last_5"],
     }
 
 
