@@ -1,6 +1,6 @@
 // import { useEffect, useState } from "react";
 import "./App.css";
-import DemoPage from "./skaters/page";
+import SkatersStatisticsPage from "./skaters/page";
 
 function App() {
    return (
@@ -8,7 +8,7 @@ function App() {
        <h1 className="text-3xl font-bold underline">
          NHL Player Statistics
        </h1>
-       <DemoPage />;
+       <SkatersStatisticsPage />
      </main>
    );
 }

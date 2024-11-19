@@ -1,6 +1,26 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
+import { ArrowUpDown } from "lucide-react"
+
+import { MoreHorizontal } from "lucide-react"
+ 
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+  } from "@/components/ui/tooltip"
 
 // This type is used to define the shape of our data.
 export type Skater = {
@@ -53,17 +73,28 @@ export type Skater = {
 };
 
 export const columns: ColumnDef<Skater>[] = [
-    {
-        accessorKey: "playerId",
-        header: "Player ID",
-    },
+    // {
+    //     accessorKey: "rowNumber",
+    //     header: "#",
+    //     cell: ({ row }) => row.index + 1,
+    // },    
+    // {
+    //     accessorKey: "playerId",
+    //     header: "Player ID",
+    // },
     {
         accessorKey: "skaterFullName",
-        header: "Full Name",
-    },
-    {
-        accessorKey: "lastName",
-        header: "Last Name",
+        header: ({ column }) => {
+            return (
+              <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              >
+                Player
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            )
+          },             
     },
     {
         accessorKey: "teamAbbrevs",
@@ -75,15 +106,48 @@ export const columns: ColumnDef<Skater>[] = [
     },
     {
         accessorKey: "points",
-        header: "P",
-    },
-    {
-        accessorKey: "assists",
-        header: "A",
+        header: ({ column }) => {
+            return (
+              <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              >
+                P
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            )
+          },    
+
+        cell: ({ row }) => (
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <span>{row.original.points}</span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <span>Points</span>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+        )
     },
     {
         accessorKey: "goals",
-        header: "G",
+        header: ({ column }) => {
+            return (
+              <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              >
+                G
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            )
+          },    
+    },    
+    {
+        accessorKey: "assists",
+        header: "A",
     },
     {
         accessorKey: "plusMinus",

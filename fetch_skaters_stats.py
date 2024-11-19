@@ -98,11 +98,10 @@ def convert_toi_to_str(toi_seconds):
 def calculate_new_statistics(player, season_id):
     """Calculates new statistics for a player."""
     player_id = player["playerId"]
+    total_games = player["gamesPlayed"]
 
     # Get and sort game log for the player
     game_log = get_game_log(player_id, season_id)
-
-    total_games = player["gamesPlayed"]
 
     # Calculate statistics for the last 5 games
     last_5_games = game_log[:5]
@@ -154,11 +153,11 @@ def calculate_new_statistics(player, season_id):
 
 def update_skaters_stats(skaters_stats, season_id):
     for player in skaters_stats["data"]:
-        new_stats = calculate_new_statistics(player, season_id)
+        if player["gamesPlayed"] > 0:
+            new_stats = calculate_new_statistics(player, season_id)
+            player.update(new_stats)
 
-        player.update(new_stats)
-
-        print(f"Updated statistics for {player['skaterFullName']}")
+            print(f"Updated statistics for {player['skaterFullName']}")
     return skaters_stats
 
 
@@ -177,9 +176,38 @@ filters = [
 query_builder = QueryBuilder()
 query_context: QueryContext = query_builder.build(filters=filters)
 
-skaters_stats = client.stats.skater_stats_with_query_context(
-    report_type="summary", query_context=query_context, aggregate=False
-)
+# skaters_stats = client.stats.skater_stats_with_query_context(
+#     report_type="summary", query_context=query_context, aggregate=False, limit=800
+# )
+start = 0
+limit = 100
+skaters_stats = {"data": []}
+iteration = 0
+
+while True:
+    response = client.stats.skater_stats_with_query_context(
+        report_type="summary",
+        query_context=query_context,
+        aggregate=False,
+        start=start,
+        limit=limit,
+    )
+    if not response["data"]:
+        break
+    skaters_stats["data"].extend(response["data"])
+    start += limit
+    iteration += 1
+    print(f"Iteration: {iteration}")
+
+skaters_stats["total"] = len(skaters_stats["data"])
+
+# Sort skaters_stats by points descending
+skaters_stats["data"].sort(key=lambda x: x["points"], reverse=True)
+print(f"Number of lines in updated_skaters_stats: {len(skaters_stats['data'])}")
+
+
+with open("skaters_stats_summary.json", "w") as outfile:
+    json.dump(skaters_stats, outfile, indent=4)
 
 # Mock
 skaters_stats_mock = {
@@ -240,13 +268,47 @@ skaters_stats_mock = {
             "teamAbbrevs": "NYR",
             "timeOnIcePerGame": 1237.875,
         },
+        {
+            "assists": 2,
+            "evGoals": 0,
+            "evPoints": 2,
+            "faceoffWinPct": 0.5,
+            "gameWinningGoals": 0,
+            "gamesPlayed": 4,
+            "goals": 0,
+            "lastName": "Helenius",
+            "otGoals": 0,
+            "penaltyMinutes": 7,
+            "playerId": 8482726,
+            "plusMinus": 1,
+            "points": 2,
+            "pointsPerGame": 0.5,
+            "positionCode": "C",
+            "ppGoals": 0,
+            "ppPoints": 0,
+            "seasonId": 20242025,
+            "shGoals": 0,
+            "shPoints": 0,
+            "shootingPct": 0.0,
+            "shootsCatches": "L",
+            "shots": 4,
+            "skaterFullName": "Samuel Helenius",
+            "teamAbbrevs": "LAK",
+            "timeOnIcePerGame": 621.5,
+        },
     ],
-    "total": 2,
+    "total": 3,
 }
 
 season_id = "20242025"
-updated_skaters_stats = update_skaters_stats(skaters_stats, season_id)
-print(json.dumps(updated_skaters_stats, indent=4))
+updated_skaters_stats = update_skaters_stats(skaters_stats_mock, season_id)
 
+# Sort skaters_stats by points descending
+updated_skaters_stats["data"].sort(key=lambda x: x["points"], reverse=True)
+
+# print(json.dumps(updated_skaters_stats, indent=4))
+print(f"Number of lines in updated_skaters_stats: {len(updated_skaters_stats['data'])}")
+
+# Save updated skaters stats to a file
 with open("skaters_stats.json", "w") as outfile:
     json.dump(updated_skaters_stats, outfile, indent=4)

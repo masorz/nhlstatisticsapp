@@ -9,7 +9,7 @@ function getData(): Skater[] {
     }));
 }
  
-export default function DemoPage() {
+export default function SkatersStatisticsPage() {
   const data = getData();
  
   return (
