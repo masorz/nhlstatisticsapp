@@ -125,9 +125,14 @@ def calculate_new_statistics(player, season_id):
     target_points = round(player["pointsPerGame"] * scheduled_games_count, 2)
     target_goals = round(goals_per_game * scheduled_games_count, 2)
 
+    # Calculate shooting percentage
+    shooting_percentage = 0.00
+    if player["shootingPct"] is not None and player["shootingPct"] != "null":
+        shooting_percentage = round(player["shootingPct"] * 100, 2)
+
     return {
         "pointsPerGame": round(player["pointsPerGame"], 2),
-        "shootingPct": round(player["shootingPct"] * 100, 2),
+        "shootingPct": shooting_percentage,
         "timeOnIcePerGameSec": toi_per_game,
         "goalsPerGame": goals_per_game,
         "shotsPerGame": shots_per_game,
@@ -296,12 +301,40 @@ skaters_stats_mock = {
             "teamAbbrevs": "LAK",
             "timeOnIcePerGame": 621.5,
         },
+        {
+            "assists": 1,
+            "evGoals": 0,
+            "evPoints": 1,
+            "faceoffWinPct": 0.4,
+            "gameWinningGoals": 0,
+            "gamesPlayed": 3,
+            "goals": 0,
+            "lastName": "Drouin",
+            "otGoals": 0,
+            "penaltyMinutes": 0,
+            "playerId": 8477494,
+            "plusMinus": -2,
+            "points": 1,
+            "pointsPerGame": 0.33333,
+            "positionCode": "L",
+            "ppGoals": 0,
+            "ppPoints": 0,
+            "seasonId": 20242025,
+            "shGoals": 0,
+            "shPoints": 0,
+            "shootingPct": None,
+            "shootsCatches": "L",
+            "shots": 0,
+            "skaterFullName": "Jonathan Drouin",
+            "teamAbbrevs": "COL",
+            "timeOnIcePerGame": 1191.6666,
+        },
     ],
-    "total": 3,
+    "total": 4,
 }
 
 season_id = "20242025"
-updated_skaters_stats = update_skaters_stats(skaters_stats_mock, season_id)
+updated_skaters_stats = update_skaters_stats(skaters_stats, season_id)
 
 # Sort skaters_stats by points descending
 updated_skaters_stats["data"].sort(key=lambda x: x["points"], reverse=True)
