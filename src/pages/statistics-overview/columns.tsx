@@ -102,6 +102,12 @@ export const columns: ColumnDef<PlayerType>[] = [
     ),
   },
   {
+    accessorKey: "goalsPerGame",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} />
+    ),
+  },  
+  {
     accessorKey: "positionCode",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} />
@@ -145,12 +151,6 @@ export const columns: ColumnDef<PlayerType>[] = [
   },
   {
     accessorKey: "timeOnIcePerGame",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} />
-    ),
-  },
-  {
-    accessorKey: "goalsPerGame",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} />
     ),
